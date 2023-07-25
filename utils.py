@@ -34,6 +34,12 @@ def get_model(model_type, num_cls, input_dim):
     elif model_type == "densenet121":
         from cifar10_models import densenet121
         model = densenet121(pretrained=False, num_classes=num_cls)
+    elif model_type == "monilenetv2":
+        from cifar10_models import mobilenet_v2
+        model = mobilenet_v2(pretrained=False, num_classes=num_cls)
+    elif model_type == "densenet121":
+        from cifar10_models import googlenet
+        model = googlenet(pretrained=False, num_classes=num_cls)
     elif model_type == "columnfc":
         from models import ColumnFC
         model = ColumnFC(input_dim=input_dim, output_dim=num_cls)
