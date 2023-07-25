@@ -122,17 +122,14 @@ def get_dataset(name, train=True):
         mean = (69, 69, 69)  # adjust according to your dataset
         std = (69, 69, 69)  # adjust according to your dataset
         transform = transforms.Compose([
-            transforms.Resize((420, 420)),  # adjust size according to your dataset
+            transforms.Resize((224, 224)),  # adjust size according to your dataset
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
         ])
 
         image_dir = '/path/to/images'  # set to your custom dataset's image directory
-        label_csv = '/path/to/labels.csv'  # set to your custom dataset's label CSV
-        if train:
-            dataset = CustomDataset(image_dir=image_dir, label_csv=label_csv, transform=transform)
-        else:
-            dataset = None  # if you have a separate test dataset, adjust this part
+        label_csv = '/path/to/labels_train.csv' if train else '/path/to/labels_val.csv'
+        dataset = CustomDataset(image_dir=image_dir, label_csv=label_csv, transform=transform)
         
     else:
         raise ValueError
