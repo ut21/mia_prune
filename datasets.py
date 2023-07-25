@@ -6,7 +6,29 @@ import torchvision
 import torchvision.transforms as transforms
 import os
 from torch.utils.data import TensorDataset
+from PIL import Image
+import pandas as pd
+from torch.utils.data import Dataset
 
+class CustomDataset(Dataset):
+    def __init__(self, image_dir, label_csv, transform=None):
+        self.image_dir = image_dir
+        self.label_df = pd.read_csv(label_csv)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.label_df)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        img_name = os.path.join(self.image_dir, self.label_df.iloc[idx, 0])
+        image = Image.open(img_name)
+        label = self.label_df.iloc[idx, 1]
+
+        if self.transform:
+            image = self.transform(image)
 
 def get_dataset(name, train=True):
     print(f"Build Dataset {name}")
@@ -95,6 +117,23 @@ def get_dataset(name, train=True):
             dataset = torchvision.datasets.ImageFolder(data_folder, transform=transform)
         else:
             dataset = None
+
+    elif name == "custom": #custom dataset consists of image files and numeric labels in a CSV file
+        mean = (69, 69, 69)  # adjust according to your dataset
+        std = (69, 69, 69)  # adjust according to your dataset
+        transform = transforms.Compose([
+            transforms.Resize((420, 420)),  # adjust size according to your dataset
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ])
+
+        image_dir = '/path/to/images'  # set to your custom dataset's image directory
+        label_csv = '/path/to/labels.csv'  # set to your custom dataset's label CSV
+        if train:
+            dataset = CustomDataset(image_dir=image_dir, label_csv=label_csv, transform=transform)
+        else:
+            dataset = None  # if you have a separate test dataset, adjust this part
+        
     else:
         raise ValueError
 
